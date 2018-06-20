@@ -36,25 +36,30 @@ localparam SUB = 4'b0100;
 localparam SLL = 4'b0101;
 localparam SRL = 4'b0110;
 
+localparam LUI = 4'b0111;
+
+
    
    always @ (A or B or ALUOperation)
      begin
 		case (ALUOperation)
-		  AND:
-			ALUResult = A & B;
-		  OR:
-		   ALUResult = A | B;
-		  NOR:
-		   ALUResult = ~(A | B);
-		  ADD: // add
-			ALUResult = A + B;
-		  SUB: // sub
-			ALUResult = A - B;
-		  SLL:
-			ALUResult = B << shamt;
-		  SRL 
-			ALUResult = B >> shamt;
-
+			AND:
+				ALUResult = A & B;
+			OR:
+				ALUResult = A | B;
+			NOR:
+				ALUResult = ~(A | B);
+			ADD: // add
+				ALUResult = A + B;
+			SUB: // sub
+				ALUResult = A - B;
+			SLL:
+				ALUResult = B << shamt;
+			SRL: 
+				ALUResult = B >> shamt;
+			LUI:
+				ALUResult = {B, 16'b0};
+			
 		default:
 			ALUResult= 0;
 		endcase // case(control)
