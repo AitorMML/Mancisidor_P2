@@ -23,8 +23,13 @@ module ProgramMemory
 	output reg [(DATA_WIDTH-1):0] Instruction
 );
 wire [(DATA_WIDTH-1):0] RealAddress;
+wire [(DATA_WIDTH-1):0] AddressFix;
 
-assign RealAddress = {2'b0,Address[(DATA_WIDTH-1):2]};
+assign AddressFix = Address-4_194_304;
+
+//localparam addressFix = 4_194_304;
+
+assign RealAddress = {2'b0,AddressFix[(DATA_WIDTH-1):2]};
 
 	// Declare the ROM variable
 	reg [DATA_WIDTH-1:0] rom[MEMORY_DEPTH-1:0];

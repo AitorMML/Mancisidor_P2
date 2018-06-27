@@ -51,10 +51,10 @@ always@(OP) begin
 		I_Type_ORI:	 ControlValues= 11'b0_101_00_00_101;
 		I_Type_ANDI: ControlValues= 11'b0_101_00_00_110;
 		I_Type_LUI:	 ControlValues= 11'b0_101_00_00_000;
-//		I_Type_BEQ:	 ControlValues= 11'bx_0x0_00_01_001;
+//		I_Type_BEQ:	 ControlValues= 11'bx_0x0_00_01_001; //hacer restas
 //		I_Type_BNE:  ControlValues= 11'b0_0x0_00_10_000;
 		I_Type_LW:	 ControlValues= 11'b0_111_10_00_100; //hace una suma
-		I_Type_SW:	 ControlValues= 11'bx_1x0_01_00_100; //hace otra suma
+		I_Type_SW:	 ControlValues= 11'b0_100_01_00_100; //hace otra suma
 		
 		//alargar para tipos J
 		//J_Type_J:	 ControlValues= 11'b0_xxx_00_00_000;

@@ -30,7 +30,7 @@ module DataMemory
 	begin
 		// Write
 		if (MemWrite)
-			ram[Address[15:0]>>2] <= WriteData;
+			ram[Address] <= WriteData;
 	end
 	assign ReadDataAux = ram[Address];
   	assign ReadData = {DATA_WIDTH{MemRead}}& ReadDataAux;
