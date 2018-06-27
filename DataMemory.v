@@ -12,7 +12,7 @@
 
 module DataMemory 
 #(	parameter DATA_WIDTH = 32,
-	parameter MEMORY_DEPTH = 1024
+	parameter MEMORY_DEPTH = 512	//$sp = 0x10010000 + d'512
 
 )
 (
@@ -24,7 +24,7 @@ module DataMemory
 	
 	// Declare the RAM variable
 	reg [DATA_WIDTH-1:0] ram[MEMORY_DEPTH-1:0];
-	wire [32:0] ReadDataAux;
+	wire [DATA_WIDTH-1:0] ReadDataAux;
 	wire [DATA_WIDTH-1:0] AddressAux; //Direccion a memoria
 	
 	assign AddressAux = (Address -32'h1001_0000)>>2; //Corrida a la derecha 
