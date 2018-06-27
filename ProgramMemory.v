@@ -36,7 +36,7 @@ assign RealAddress = {2'b0,AddressFix[(DATA_WIDTH-1):2]};
 
 	initial
 	begin
-		$readmemh("C:/MIPS_Projects/MIPS_SingleCycle/Sources/text.dat", rom);	//Puede borrarse si está en la misma carpeta
+		$readmemh("C:/MIPS_Processor/MIPS_Single_Cycle/Sources/text.dat", rom);	//Puede borrarse si está en la misma carpeta
 	end
 
 	always @ (RealAddress)
