@@ -75,6 +75,10 @@ wire [31:0] PC_4_wire;
 wire [31:0] PC_wire;
 wire [31:0] InmmediateExtendAnded_wire;
 wire [31:0] PCtoBranch_wire;
+wire [31:0] ShiftedImmediateExtended_wire;
+wire [31:0] BranchAddress_wire;	//El que entra al mux
+wire [31:0] BranchResult_wire;	// El que vuelve a PC
+
 integer ALUStatus;
 
 
@@ -103,7 +107,7 @@ ProgramCounter
 (
 	.clk(clk),
 	.reset(reset),
-	.NewPC(PC_4_wire),
+	.NewPC(BranchResult_wire),
 	.PCValue(PC_wire)
 );
 
@@ -212,6 +216,7 @@ ArithmeticLogicUnit
 
 assign ALUResultOut = ALUResult_wire;
 
+//LW y SW
 DataMemory
 #(
 	.MEMORY_DEPTH(MEMORY_DEPTH)
@@ -241,6 +246,58 @@ MUX_WB_ALUorRAM
 
 );
 
+
+
+//Branches
+ShiftLeft2
+BranchesShiftLeft2
+(
+	.DataInput(InmmediateExtend_wire),
+	.DataOutput(ShiftedImmediateExtended_wire)
+);
+
+Adder32bits
+BranchAdder
+(
+	.Data0(PC_4_wire),
+	.Data1(ShiftedImmediateExtended_wire),
+	
+	.Result(BranchAddress_wire)
+);
+
+ANDGate
+BEQ_AND
+(
+	.A(BranchEQ_wire),
+	.B(Zero_wire),
+	
+	.C(ZeroANDBrachEQ)
+);
+
+ANDGate
+BNE_AND
+(
+	.A(BranchNE_wire),
+	.B(~Zero_wire),				//No debe ser 0
+	
+	.C(NotZeroANDBrachNE)
+);
+
+
+Multiplexer2to1_Modified
+#(
+	.NBits(32)
+)
+BEQ_MUX
+(
+	.Selector1(ZeroANDBrachEQ),
+	.Selector2(NotZeroANDBrachNE),
+	.MUX_Data0(PC_4_wire),
+	.MUX_Data1(BranchAddress_wire),
+	
+	.MUX_Output(BranchResult_wire)
+
+);
 
 endmodule
 
