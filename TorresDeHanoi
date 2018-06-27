@@ -1,0 +1,113 @@
+.data 
+.text
+
+	addi $a0, $zero, 0x10010000 #Source tower
+	addi $a1, $zero, 0x10010040 #Auxiliar tower
+	addi $a2, $zero, 0x10010080 #Destination tower
+	addi $a3, $zero, 5 #Disk number
+	addi $t8, $zero, 0x100100c0
+	
+	add $s4, $zero, $a3	#Copy of disk numbers
+	
+MemoryCleanUp:
+	sw $0, 0($a0)
+ 	addi $a0, $a0, 4
+ 	bne $a0, $t8, MemoryCleanUp
+ 	addi $a0, $zero, 0x10010000 #Return value to source tower	
+ 
+LoadTower:
+	
+	beq $s4, $zero, Hanoi	# Jumps Recursive
+	sw $s4, 0($a0)		# Tower starts filling
+	addi $s4, $s4, -1	# Reduce dsik number
+	addi $a0, $a0, 4	# Move one up position in array
+	j LoadTower		# Conditional
+
+Hanoi:
+	bne $a3, 1, LoadStack #Go to stack
+	
+
+GoInitial:
+	lw $t0, ($a0)	#Load RAM from source tower
+	bne $t0, $zero, MovePointerOrigin
+	addi $a0, $a0, -4 #Move to top ring
+	lw $t0, ($a0) #Move top disk to temporary
+	sw $zero, ($a0) #Deleting disk that was move
+	
+CheckDestination:
+	lw $t1, ($a2) #Move destination tower to temporary
+	beq $t1, $zero, StoreDestination #Check that pointer is on top
+	addi $a2, $a2, 4 #Move pointer one position
+	j CheckDestination
+	
+StoreDestination:
+	sw $t0, ($a2) #Storing disk at the top of destination
+	jr $ra #Return, go to last recursive call	
+			
+	
+MovePointerOrigin:
+	addi $a0, $a0, 4 #Move one up in tower
+	j GoInitial
+	
+LoadStack:
+	addi $sp, $sp, -20 #Moves SP
+	
+	sw $a3, 16($sp) #Store number of disk in stak
+	sw $a0, 12($sp) #Store source tower 
+	sw $a1, 8($sp) #Store aux tower
+	sw $a2, 4($sp) #Store destination tower
+	sw $ra, 0($sp) #Store return address
+	
+	addi $a3, $a3, -1 #Substract from disk number
+	add $t0, $zero, $a1 #Auxilliar tower loads into tempory
+	add $a1, $a2, $zero #Change destination to auxiliar
+	add $a2, $t0, $zero #Load temporary into destination
+	
+	jal Hanoi #Recursive call
+	 
+#Return point for jr $ra
+
+	lw $a3, 16($sp) #Load number of disk in stak
+	lw $a0, 12($sp) #Load source tower 
+	lw $a1, 8($sp) #Load aux tower
+	lw $a2, 4($sp) #Load destination tower
+	lw $ra, 0($sp) #Load return address
+	
+#Move other disks
+
+	lw  $t1, ($a0) # Moves following disk from source to destination
+	
+CheckOrigin:
+	beq $t1, $zero, GetLastDisc
+	addi $a0, $a0, 4	#Moves pointer forward one byte	
+	lw $t1, ($a0) #Store source in teporary
+	bne $t1, $zero, CheckOrigin
+		# Continues if $t1 = 0
+GetLastDisc:
+	addi $a0, $a0, -4 # Moves pointer one byte backwards to get last disc from origin
+	lw $t1, ($a0) #Loads disk to temporary
+	beq $t1, $zero, GetLastDisc
+	sw $zero, ($a0) #Deletes disk from tower
+	
+CheckDestination2:
+	lw $t2, ($a2) #Move destination tower to temporary
+	beq $t2, $zero, StoreDestination2 #Check that pointer is on top
+	addi $a2, $a2, 4 #Move pointer one position
+	j CheckDestination2
+	
+StoreDestination2:
+	sw $t1, ($a2) #Storing disk at the top of destination
+	
+	addi $a3, $a3, -1 #Substract from disk number
+	add $t3, $a0, $zero #Move source to temporary
+	add $a0, $a1, $zero #Move auxiliar to source
+	add $a1, $t3, $zero #Move temporary to auxiliar
+	
+	jal Hanoi #Go to first Hanoi call
+	
+	lw $ra, ($sp) #Load to return address stack pointer
+	
+	beq $ra, $zero, Exit #Checks theyr're no more recursive calls
+	addi $sp, $sp, 20 #Moves stack pointer one disk
+	jr $ra #Return tu recursive call
+Exit:
