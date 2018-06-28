@@ -334,6 +334,7 @@ JumpMUX
 
 );
 
+//JAL
 Multiplexer2to1
 #(
 	.NBits(32)
@@ -342,7 +343,7 @@ JALMUX
 (
 	.Selector(JAL_wire),
 	.MUX_Data0(WriteBack_wire),
-	.MUX_Data1(JumpResult_wire),
+	.MUX_Data1(BranchResult_wire), //Escribe pc+4 en $ra ; no está cambiando PC  
 	
 	.MUX_Output(JALResult_Writeback_wire)
 );

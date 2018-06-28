@@ -2,43 +2,40 @@
 
 .text
 
-addi $t0, $zero, 0x00400000
-add $t1, $zero, $zero #4 
-addi $t1, $t1, 1 #8 
-addi $t1, $t1, 1 #0c
-addi $t1, $t1, 1 #10
-addi $t1, $t1, 1 #14
-addi $t1, $t1, 1 #18
-jr $t0
-
-
-
-
-
-
 #	addi $sp, $zero, $10010200	# Inicio de memoria + d'512
 
-#	addi $t3, $zero, 15
-#adds:
-#	addi $t0, $t0, 5
-#	addi $t1, $t1, 6
-#	addi $t2, $t2, 7
-#	beq $t0, $t3, salto
-	
-#	jal adds
-	
-#subs:
-#	addi $t0, $zero, -5
-#	addi $t1, $zero, -4
-#	addi $t2, $zero, -3
-	
-#	j exit
-	
-#salto:
-#	jr $ra
 
-#exit:
-#	addi $t0, $zero, 20
+#	addi $t0, $zero, 0x00400000
+#	add $t1, $zero, $zero #4 
+#	addi $t1, $t1, 1 #8 
+#	addi $t1, $t1, 1 #0c
+#	addi $t1, $t1, 1 #10
+#	addi $t1, $t1, 1 #14
+#	addi $t1, $t1, 1 #18
+#	jr $t0
+
+
+	addi $t3, $zero, 15
+adds:
+	addi $t0, $t0, 5
+	addi $t1, $t1, 6
+	addi $t2, $t2, 7
+	beq $t0, $t3, salto
+	
+	jal adds
+	
+subs:
+	addi $t0, $zero, -5
+	addi $t1, $zero, -4
+	addi $t2, $zero, -3
+	
+	j exit
+	
+salto:
+	jr $ra
+
+exit:
+	addi $t0, $zero, 20
 
 
 #	addi $t0, $zero, 5
