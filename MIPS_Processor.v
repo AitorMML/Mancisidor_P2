@@ -59,8 +59,10 @@ wire MemWrite_wire;
 wire MemtoReg_wire;
 wire Zero_wire;
 wire Jump_wire;
+wire JAL_wire;
 wire [2:0] ALUOp_wire;
 wire [3:0] ALUOperation_wire;
+wire [4:0] IorJ_wire;
 wire [4:0] WriteRegister_wire;
 
 wire [27:0] ShiftedInstruction_wire;
@@ -80,7 +82,8 @@ wire [31:0] ShiftedImmediateExtended_wire;
 wire [31:0] BranchAddress_wire;	// El que entra al mux de ramas
 wire [31:0] BranchResult_wire;	// El que entra al MUX del salto
 wire [31:0] JumpAddress_wire;		// Combinación del desplazo de instrucción y parte alta de PC+4
-wire [31:0] JumpResult_wire;		// El que vuelve a PC
+wire [31:0] JumpResult_wire;		// Resultado del MUX, entra el MUX de JR
+wire [31:0] JALResult_Writeback_wire;			// Vuelve a PC
 
 integer ALUStatus;
 
@@ -94,6 +97,7 @@ Control
 ControlUnit
 (
 	.OP(Instruction_wire[31:26]),
+	.JAL(JAL_wire),
 	.Jump(Jump_wire),
 	.RegDst(RegDst_wire),
 	.BranchNE(BranchNE_wire),
@@ -151,7 +155,7 @@ MUX_ForRTypeAndIType
 	.MUX_Data0(Instruction_wire[20:16]),
 	.MUX_Data1(Instruction_wire[15:11]),
 	
-	.MUX_Output(WriteRegister_wire)
+	.MUX_Output(IorJ_wire)
 
 );
 
@@ -166,7 +170,7 @@ Register_File
 	.WriteRegister(WriteRegister_wire),
 	.ReadRegister1(Instruction_wire[25:21]),
 	.ReadRegister2(Instruction_wire[20:16]),
-	.WriteData(WriteBack_wire),	//viene de RAM
+	.WriteData(JALResult_Writeback_wire),	//viene de RAM
 	.ReadData1(ReadData1_wire),
 	.ReadData2(ReadData2_wire)
 
@@ -325,5 +329,34 @@ JumpMUX
 	.MUX_Output(JumpResult_wire)
 
 );
+
+Multiplexer2to1
+#(
+	.NBits(32)
+)
+JALMUX
+(
+	.Selector(JAL_wire),
+	.MUX_Data0(WriteBack_wire),
+	.MUX_Data1(JumpResult_wire),
+	
+	.MUX_Output(JALResult_Writeback_wire)
+);
+
+Multiplexer2to1
+#(
+	.NBits(5)
+)
+StoreRA_MUX						// Seleccionar registro a almacenar
+(
+	.Selector(JAL_wire),
+	.MUX_Data0(IorJ_wire), 	// registro normal ($rd o $rt)
+	.MUX_Data1(31),			// $ra
+	
+	.MUX_Output(WriteRegister_wire)
+);
+
+
+	
 endmodule
 

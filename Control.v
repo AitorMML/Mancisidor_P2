@@ -15,6 +15,7 @@ module Control
 (
 	input [5:0]OP,
 	
+	output JAL,
 	output Jump,
 	output RegDst,
 	output BranchEQ,
@@ -43,29 +44,31 @@ localparam J_Type_JAL	= 6'h03;
 // localparam JR			= 6'h0 es tipo R
 
 
-reg [11:0] ControlValues;
+reg [12:0] ControlValues;
 
 always@(OP) begin
 	casex(OP)
-		R_Type:      ControlValues= 12'b0_1_001_00_00_111;
-		I_Type_ADDI: ControlValues= 12'b0_0_101_00_00_100;
-		I_Type_ORI:	 ControlValues= 12'b0_0_101_00_00_101;
-		I_Type_ANDI: ControlValues= 12'b0_0_101_00_00_110;
-		I_Type_LUI:	 ControlValues= 12'b0_0_101_00_00_000;
-		I_Type_LW:	 ControlValues= 12'b0_0_111_10_00_100; //hace una suma
-		I_Type_SW:	 ControlValues= 12'b0_0_100_01_00_100; //hace otra suma
-		I_Type_BEQ:	 ControlValues= 12'b0_0_0x0_00_01_001; //hacer restas
-		I_Type_BNE:  ControlValues= 12'b0_0_0x0_00_10_001;
+		R_Type:      ControlValues= 13'b00_1_001_00_00_111;
+		I_Type_ADDI: ControlValues= 13'b00_0_101_00_00_100;
+		I_Type_ORI:	 ControlValues= 13'b00_0_101_00_00_101;
+		I_Type_ANDI: ControlValues= 13'b00_0_101_00_00_110;
+		I_Type_LUI:	 ControlValues= 13'b00_0_101_00_00_000;
+		I_Type_LW:	 ControlValues= 13'b00_0_111_10_00_100; //hace una suma
+		I_Type_SW:	 ControlValues= 13'b00_0_100_01_00_100; //hace otra suma
+		I_Type_BEQ:	 ControlValues= 13'b00_0_0x0_00_01_001; //hacer restas
+		I_Type_BNE:  ControlValues= 13'b00_0_0x0_00_10_001;
 
-		J_Type_J:	 ControlValues= 12'b1_0_000_00_00_000;
-		J_Type_JAL:	 ControlValues= 12'b1_0_001_00_00_000;
+		J_Type_J:	 ControlValues= 13'b01_0_000_00_00_000;
+		J_Type_JAL:	 ControlValues= 13'b11_0_001_00_00_000;
 		
 		default:
-			ControlValues= 12'b0_0_000_00_00_000;
+			ControlValues= 13'b00_0_000_00_00_000;
 		endcase
 end	
 
+assign JAL			= ControlValues[12];		// 0 WritreBack a RegFile,		1 Escribe en RegFile Resultado del salto
 assign Jump			= ControlValues[11];		// 0 no salta,						1 salta		
+
 assign RegDst 		= ControlValues[10];		// 0 para guardar en rt, 		1 para guardar en rd
 
 assign ALUSrc 		= ControlValues[9];		// 0 para alimentar readData2,1 para alimentar inmediato extendido,

@@ -36,6 +36,8 @@ localparam I_Type_LW		= 9'b010_xxxxxx;	//sw y lw hacen suma de registro e inmedi
 localparam I_Type_SW		= 9'b011_xxxxxx;
 localparam BEQ_AND_BNE	= 9'b001_xxxxxx;
 
+//localparam R-Type_JR		= 9'b
+
 
 reg [3:0] ALUControlValues;
 wire [8:0] Selector;
@@ -60,6 +62,8 @@ always@(Selector)begin
 		I_Type_SW:		ALUControlValues = 4'b0011;
 		
 		BEQ_AND_BNE:	ALUControlValues = 4'b0100;	//Para hacer una resta
+		
+//		R_Type_JR:		ALUControlValues = 4'b1000;
 		
 		default: ALUControlValues = 4'b1001;
 	endcase
