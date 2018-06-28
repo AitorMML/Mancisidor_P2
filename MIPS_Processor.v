@@ -60,6 +60,9 @@ wire MemtoReg_wire;
 wire Zero_wire;
 wire Jump_wire;
 wire JAL_wire;
+wire OPCodeAND_wire;
+wire FuncAND_wire;
+wire JRControl_wire;
 wire [2:0] ALUOp_wire;
 wire [3:0] ALUOperation_wire;
 wire [4:0] IorJ_wire;
@@ -83,7 +86,8 @@ wire [31:0] BranchAddress_wire;	// El que entra al mux de ramas
 wire [31:0] BranchResult_wire;	// El que entra al MUX del salto
 wire [31:0] JumpAddress_wire;		// Combinación del desplazo de instrucción y parte alta de PC+4
 wire [31:0] JumpResult_wire;		// Resultado del MUX, entra el MUX de JR
-wire [31:0] JALResult_Writeback_wire;			// Vuelve a PC
+wire [31:0] JALResult_Writeback_wire; // Pone PC o WB en RegFile
+wire [31:0] JRResult_wire;			// Vuelve a PC
 
 integer ALUStatus;
 
@@ -115,7 +119,7 @@ ProgramCounter
 (
 	.clk(clk),
 	.reset(reset),
-	.NewPC(JumpResult_wire),
+	.NewPC(JRResult_wire),
 	.PCValue(PC_wire)
 );
 
@@ -357,6 +361,43 @@ StoreRA_MUX						// Seleccionar registro a almacenar
 );
 
 
+//JR
+LargeANDGate
+OPCodeAND
+(
+	.A(Instruction_wire[31:26]),
+	.B(0),
+	.C(OPCodeAND_wire)
+);
+
+LargeANDGate
+FuncAND
+(
+	.A(Instruction_wire[5:0]),
+	.B(8),
+	.C(FuncAND_wire)
+);
+
+ANDGate
+JRANDGate
+(
+	.A(OPCodeAND_wire),
+	.B(FuncAND_wire),
+	.C(JRControl_wire)
+);
+
+Multiplexer2to1
+#(
+	.NBits(32)
+)
+JRMUX	
+(
+	.Selector(JRControl_wire),		// resultado de la AND
+	.MUX_Data0(JumpResult_wire), 	// Siguiente tiempo si no salta
+	.MUX_Data1(ReadData1_wire),	// Contenido de rs
 	
+	.MUX_Output(JRResult_wire)		//Manda a PC
+);
+
 endmodule
 
