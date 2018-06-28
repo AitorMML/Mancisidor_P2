@@ -51,18 +51,19 @@ wire BranchEQ_wire;
 wire RegDst_wire;
 wire NotZeroANDBrachNE;
 wire ZeroANDBrachEQ;
-wire ORForBranch;
+//wire ORForBranch;
 wire ALUSrc_wire;
 wire RegWrite_wire;
 wire MemRead_wire;
 wire MemWrite_wire;
 wire MemtoReg_wire;
 wire Zero_wire;
+wire Jump_wire;
 wire [2:0] ALUOp_wire;
 wire [3:0] ALUOperation_wire;
 wire [4:0] WriteRegister_wire;
 
-
+wire [27:0] ShiftedInstruction_wire;
 wire [31:0] Instruction_wire;
 wire [31:0] ReadData1_wire;
 wire [31:0] ReadData2_wire;
@@ -76,8 +77,10 @@ wire [31:0] PC_wire;
 wire [31:0] InmmediateExtendAnded_wire;
 wire [31:0] PCtoBranch_wire;
 wire [31:0] ShiftedImmediateExtended_wire;
-wire [31:0] BranchAddress_wire;	//El que entra al mux
-wire [31:0] BranchResult_wire;	// El que vuelve a PC
+wire [31:0] BranchAddress_wire;	// El que entra al mux de ramas
+wire [31:0] BranchResult_wire;	// El que entra al MUX del salto
+wire [31:0] JumpAddress_wire;		// Combinación del desplazo de instrucción y parte alta de PC+4
+wire [31:0] JumpResult_wire;		// El que vuelve a PC
 
 integer ALUStatus;
 
@@ -91,6 +94,7 @@ Control
 ControlUnit
 (
 	.OP(Instruction_wire[31:26]),
+	.Jump(Jump_wire),
 	.RegDst(RegDst_wire),
 	.BranchNE(BranchNE_wire),
 	.BranchEQ(BranchEQ_wire),
@@ -107,7 +111,7 @@ ProgramCounter
 (
 	.clk(clk),
 	.reset(reset),
-	.NewPC(BranchResult_wire),
+	.NewPC(JumpResult_wire),
 	.PCValue(PC_wire)
 );
 
@@ -299,5 +303,27 @@ BEQ_MUX
 
 );
 
+ShiftLeft2
+JumpShift
+(
+	.DataInput(Instruction_wire[25:0]),
+	.DataOutput(ShiftedInstruction_wire)
+);
+
+assign JumpAddress_wire = {PC_4_wire[31:28],ShiftedInstruction_wire}; //[27:0]
+
+Multiplexer2to1
+#(
+	.NBits(32)
+)
+JumpMUX
+(
+	.Selector(Jump_wire),
+	.MUX_Data0(BranchResult_wire),
+	.MUX_Data1(JumpAddress_wire),
+	
+	.MUX_Output(JumpResult_wire)
+
+);
 endmodule
 

@@ -1,19 +1,45 @@
-# Test program for unicycle MIPS
-.data
+#Description: Test program for BEQ, BNE
 
 .text
+#	addi $sp, $zero, $10010200	# Inicio de memoria + d'512
+
 	addi $t0, $zero, 5
 	add $t1, $zero, $zero
 while:
 	beq $t1, $t0, exit
 	addi $t1, $t1, 1
 	bne $t1, $zero, while
-
-
 	
 exit:
 	add $t2, $t1, $t1
 	sll $t3, $t2, 2
+	j part2
+	addi $t3, $t1, 5
+	
+part2:
+	#addi $t2, $zero, 0x10010000
+	lui $t2, 0x1001
+#	jr $t2 	
+	sw $t0, 0($t2)
+	lw $t1, 0($t2)
+
+
+
+
+
+	
+#	addi $t0, $zero, 5
+#	add $t1, $zero, $zero
+#while:
+#	beq $t1, $t0, exit
+#	addi $t1, $t1, 1
+#	bne $t1, $zero, while
+
+
+	
+#exit:
+#	add $t2, $t1, $t1
+#	sll $t3, $t2, 2
 
 
 
