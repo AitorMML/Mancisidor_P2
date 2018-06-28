@@ -15,7 +15,7 @@
 module ProgramMemory
 #
 (
-	parameter MEMORY_DEPTH=32, //2048
+	parameter MEMORY_DEPTH=2048, //2048
 	parameter DATA_WIDTH=32
 )
 (
@@ -25,7 +25,7 @@ module ProgramMemory
 wire [(DATA_WIDTH-1):0] RealAddress;
 wire [(DATA_WIDTH-1):0] AddressFix;
 
-assign AddressFix = Address-4_194_304;
+assign AddressFix = Address - 32'h0040_0000;	//-4_194_304;
 
 //localparam addressFix = 4_194_304;
 
